@@ -28,6 +28,14 @@ model.update = function (id, data) {
 	return collection.update({_id: id}, data);
 };
 
+model.findOne = function () {
+	return model.collection.findOneAsync.apply(model.collection, arguments);
+};
+
+model.find = function () {
+	return model.collection.findAsync.apply(model.collection, arguments);
+};
+
 model.check = runTimeout(function checkTriggersRun () {
 	return repoModel.getByType(repoModel.TYPE.LIB)
 		.then(function (libRepos){
@@ -46,24 +54,24 @@ model.check = runTimeout(function checkTriggersRun () {
 							if (repo.type === repoModel.TYPE.CORE) {
 								return Promise.each(libRepos, function (target) {
 									return jobModel.insert({
-										trigger_id: trigger._id,
+										trigger_id: trigger._id.id,
 										status: model.STATUS.INIT,
-										target: target._id,
-										source: repo._id
+										target: target._id.id,
+										source: repo._id.id
 									});
 								});
 							} else {
 								return jobModel.insert({
-									trigger_id: trigger._id,
+									trigger_id: trigger._id.id,
 									status: model.STATUS.INIT,
-									target: repo._id,
-									source: repo._id
+									target: repo._id.id,
+									source: repo._id.id
 								});
 							}
 						}).then(
 							jobModel.check
 						).then(
-							model.update.bind(model, trigger._id, {status: model.STATUS.STARTED})
+							model.update.bind(model, trigger._id, {$set: {status: model.STATUS.STARTED}})
 						);
 				});
 		});

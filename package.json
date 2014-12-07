@@ -15,6 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "bluebird": "^2.3.11",
+    "handlebars": "^2.0.0",
     "hapi": "^7.5.2",
     "hapi-colm": "git://github.com/yonjah/hapi-colm.git",
     "hoek": "^2.10.0",

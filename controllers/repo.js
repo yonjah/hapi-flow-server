@@ -33,8 +33,9 @@ module.exports = [{
 		method : 'POST',
 		path   : '/repo',
 		handler: function (request, reply) {
-			var url   = request.payload.url,
-				type  = request.payload.type || '',
+			var url     = request.payload.url,
+				type    = request.payload.type || '',
+				branch  = request.payload.branch || 'master',
 				parts = url.split('/'),
 				name  = parts[parts.length -1].replace('.git', '');
 
@@ -64,7 +65,7 @@ module.exports = [{
 					url         : url,
 					name        : name,
 					type        : type,
-					branch      : 'master',
+					branch      : branch,
 					test_command: 'npm run test-xml',
 					report_file : 'result.xml',
 					jobs        : []

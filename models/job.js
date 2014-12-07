@@ -32,37 +32,50 @@ model.update = function (id, data) {
 	return model.collection.update({_id: id}, data);
 };
 
+model.findOne = function () {
+	return model.collection.findOneAsync.apply(model.collection, arguments);
+};
+
+model.find = function () {
+	return model.collection.findAsync.apply(model.collection, arguments);
+};
 model.runJob = function runJob (job) {
-	var buildOptions = {};
+	var buildOptions = { FLOW_CMD: 'cd node_modules'};
+
 	return Promise.all([
 			require('./trigger').get(job.trigger_id),
 			repoModel.get(job.target)
 		]).spread(function (trigger, target) {
 			hoek.merge(buildOptions, {
-				'TEST_REPO'    : target.url,
-				'TEST_REPO_DIR': target.name,
-				'TEST_COMMAND' : target.test_command,
-				'REPORT_FILE'  : target.report_file
+				TEST_REPO    : target.url,
+				TEST_REPO_DIR: target.name,
+				TEST_BRANCH  : target.branch,
+				TEST_COMMAND : target.test_command,
+				REPORT_FILE  : target.report_file
 			});
 			return trigger;
 		}).then(function (trigger) {
-			repoModel.getByType(repoModel.TYPE.CORE)
+			return repoModel.getByType(repoModel.TYPE.CORE)
 				.then(function (repos){
 					return repos.toArrayAsync();
 				}).map(function (repo){
-					var repoId = repo.name.toUpperCase();
-					buildOptions[ repoId + '_REPO'] = repo.url;
-					if (job.source === repo._id) {
-						buildOptions[ repoId + '_COMMIT'] = trigger.commit;
+					buildOptions.FLOW_CMD += ' && rm -r ' + repo.name;
+					buildOptions.FLOW_CMD += ' && git clone ' + repo.url;
+					buildOptions.FLOW_CMD += ' && cd ' + repo.name;
+					if (job.source === repo._id.id) {
+						buildOptions.FLOW_CMD += ' && git checkout ' + trigger.commit;
 					}
-				}).then(console.log.bind(this, buildOptions));
+					buildOptions.FLOW_CMD += ' && npm install &&  cd ..';
+				});
 		}).then(
 			ciDriver.runBuild.bind(ciDriver, buildOptions)
 		).then(function (result){
 			var build = result.build_num;
 			return model.update(job._id, {
+				$set: {
 				status: model.STATUS.STARTED,
 				build_id : build
+				}
 			});
 		}).then(
 			model.checkStatus
@@ -83,14 +96,18 @@ model.updateStatus = function updateStatus (job) {
 		if (build.lifecycle === 'finished') {
 			if (build.has_artifacts) {
 				ciDriver.getBuildResult(job.build_id).then(function (result){
-					return model.update(job._id, {
-						result: result
+					return model.update(job._id,
+						{ $set : {
+							result: result
+						}
 					});
 				});
 			}
 			return model.update(job._id, {
-				status : model.STATUS.DONE,
-				success: build.outcome === 'success'
+				$set: {
+					status : model.STATUS.DONE,
+					success: build.outcome === 'success'
+				}
 			});
 		}
 		return job;
