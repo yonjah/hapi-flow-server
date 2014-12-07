@@ -36,6 +36,8 @@ module.exports = [{
 			var url     = request.payload.url,
 				type    = request.payload.type || '',
 				branch  = request.payload.branch || 'master',
+				test    = request.payload.branch || 'npm run test-xml',
+				report  = request.payload.report || 'result.xml',
 				parts = url.split('/'),
 				name  = parts[parts.length -1].replace('.git', '');
 
@@ -66,8 +68,8 @@ module.exports = [{
 					name        : name,
 					type        : type,
 					branch      : branch,
-					test_command: 'npm run test-xml',
-					report_file : 'result.xml',
+					test_command: test,
+					report_file : report,
 					jobs        : []
 				}).then(function (result){
 					return result[0];
