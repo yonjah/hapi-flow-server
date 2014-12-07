@@ -8,14 +8,27 @@ var Promise       = require('bluebird'),
 		collection: collection
 	};
 
+model.getBy = function (param, value) {
+	var data = {};
+	data[param] = value;
+	return model.collection.findAsync(data);
+};
 
 model.get = function (id) {
 	return model.collection.findOneAsync({_id: id});
 };
 
-model.getByType = function (type) {
-	return model.collection.findAsync({type: type});
+model.findOne = function () {
+	return model.collection.findOneAsync.apply(model.collection, arguments);
 };
+
+model.find = function () {
+	return model.collection.findAsync.apply(model.collection, arguments);
+};
+
+model.getByType = model.getBy.bind(model, 'type');
+model.getByName = model.getBy.bind(model, 'name');
+model.getByUrl = model.getBy.bind(model, 'url');
 
 
 model.insert = function (data) {
