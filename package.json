@@ -1,0 +1,26 @@
+{
+  "name": "hapi-flow",
+  "version": "0.0.1",
+  "description": "Continuous integration testing for Hapi packages",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "hapi",
+    "ci",
+    "test"
+  ],
+  "author": "Yoni Jah",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^2.3.11",
+    "hapi": "^7.5.2",
+    "hapi-colm": "git://github.com/yonjah/hapi-colm.git",
+    "hoek": "^2.10.0",
+    "joi": "^5.0.2",
+    "lout": "^5.2.0",
+    "request": "^2.49.0",
+    "tingodb": "^0.3.1"
+  }
+}
