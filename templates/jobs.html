@@ -1,0 +1,24 @@
+<ul class="list-group">
+{{#each jobs}}
+	{{#if success}}
+	<li class="list-group-item-success list-group-item">
+	{{else}}
+	<li class="list-group-item-danger list-group-item">
+	{{/if}}
+	{{#if source}}
+		From: {{source.name}}
+	{{else}}
+		Update
+	{{/if}}
+
+	To: {{target.name}}
+
+	<a class="badge" title="CI results" href="https://circleci.com/gh/yonjah/hapi-flow-tester/{{build_id}}">
+		<span class="glyphicon glyphicon-list-alt"></span>
+	</a>
+	{{#unless success}}
+		<span class="badge">{{failCount}}</span>
+	{{/unless}}
+	</li>
+{{/each}}
+</ul>
