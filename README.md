@@ -1,4 +1,4 @@
-# hapi-flow-server
+# hapi-flow-server DEPRECATED This project is no longer maintained
 
 A CI server to test Hapi.js depended code against hapi latest changes.
 
